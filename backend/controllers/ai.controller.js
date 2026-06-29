@@ -63,139 +63,358 @@
 
 
 
-/*************************************************/
+// /*************************************************/
+// const { breakdownTask } = require("../services/gemini.service");
+
+// const { calculateRisk } = require("../utils/riskEngine");
+
+// const { saveTask , getAllTasks } = require("../services/task.service");
+
+// /// added 
+// const {
+//     generateSchedule
+// } = require("../utils/scheduleEngine");
+// //
+
+
+// async function breakdownTaskController(req, res) {
+
+//     console.log("=================================");
+//     console.log("Request received!");
+//     console.log(req.body);
+//     console.log("=================================");
+
+//     try {
+
+//         const { task, deadline, freeHoursPerDay } = req.body;
+
+//         const freeHours = Number(freeHoursPerDay);
+
+//         // Basic validation
+//         if (
+//     !task ||
+//     !deadline ||
+//     freeHoursPerDay === undefined
+// ) {
+//     return res.status(400).json({
+//         success: false,
+//         message: "Task, deadline and freeHoursPerDay are required."
+//     });
+// }
+
+//         const aiResponse = await breakdownTask(task, deadline);
+//         const riskAnalysis = calculateRisk({
+
+//     deadline,
+
+//     totalEstimatedHours:
+//         aiResponse.total_estimated_hours,
+
+//     freeHoursPerDay: freeHours,
+
+
+//     difficulty:
+//         aiResponse.difficulty
+
+// });
+
+//     //later added 
+//     const scheduleAnalysis = generateSchedule({
+
+//         subtasks: aiResponse.subtasks,
+
+//         deadline,
+
+//         freeHoursPerDay: freeHours
+
+//     });
+//     //
+
+
+//     // added/////////////////
+//     const savedTask = await saveTask({
+
+//     task,
+
+//     deadline,
+
+//     free_hours_per_day: freeHours,
+
+//     total_estimated_hours: aiResponse.total_estimated_hours,
+
+//     difficulty: aiResponse.difficulty,
+
+//     pri_score: riskAnalysis.pri,
+
+//     risk_level: riskAnalysis.level,
+
+//     recommendation: riskAnalysis.recommendation,
+
+//     ai_response: aiResponse,
+
+//     // later add
+//     schedule: scheduleAnalysis
+
+// });
+//     ///////////////////
+
+
+
+// //         res.json({
+// //     success:true,
+// //     taskAnalysis: aiResponse,
+// //     riskAnalysis
+// // });
+
+//     res.json({
+//     success: true,
+
+//     data: {
+//         savedTask,
+//         taskAnalysis: aiResponse,
+//         riskAnalysis,
+//         scheduleAnalysis
+//     }
+
+// });
+
+//     } catch (error) {
+
+//         console.error(error);
+
+//         res.status(500).json({
+//             success: false,
+//             message: error.message
+//         });
+
+//     }
+// }
+// ////////////
+
+
+
+// /// added 
+// async function getAllTasksController(req, res) {
+
+//     try {
+
+//         const tasks = await getAllTasks();
+
+//         res.json({
+
+//             success: true,
+
+//             data: tasks
+
+//         });
+
+//     }
+
+//     catch (error) {
+
+//         console.error(error);
+
+//         res.status(500).json({
+
+//             success: false,
+
+//             message: error.message
+
+//         });
+
+//     }
+
+// }
+// //
+
+// module.exports = {
+//     breakdownTaskController,
+//     getAllTasksController
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const { breakdownTask } = require("../services/gemini.service");
-
 const { calculateRisk } = require("../utils/riskEngine");
+const { generateSchedule } = require("../utils/scheduleEngine");
 
-const { saveTask , getAllTasks } = require("../services/task.service");
-
-/// added 
 const {
-    generateSchedule
-} = require("../utils/scheduleEngine");
-//
-
+    saveTask,
+    getAllTasks
+} = require("../services/task.service");
 
 async function breakdownTaskController(req, res) {
+
+    console.log("=================================");
+    console.log("Request received!");
+    console.log(req.body);
+    console.log("=================================");
 
     try {
 
         const { task, deadline, freeHoursPerDay } = req.body;
+
         const freeHours = Number(freeHoursPerDay);
 
-        // Basic validation
+        // Validation
         if (
-    !task ||
-    !deadline ||
-    freeHoursPerDay === undefined
-) {
-    return res.status(400).json({
-        success: false,
-        message: "Task, deadline and freeHoursPerDay are required."
-    });
-}
+            !task ||
+            !task.trim() ||
+            !deadline ||
+            !deadline.trim() ||
+            freeHoursPerDay === undefined ||
+            freeHoursPerDay === ""
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Task, deadline and freeHoursPerDay are required."
+            });
+        }
+
+        console.log("STEP 1 : Calling Gemini");
 
         const aiResponse = await breakdownTask(task, deadline);
+
+        console.log("STEP 2 : Gemini Finished");
+
         const riskAnalysis = calculateRisk({
 
-    deadline,
+            deadline,
 
-    totalEstimatedHours:
-        aiResponse.total_estimated_hours,
+            totalEstimatedHours:
+                aiResponse.total_estimated_hours,
 
-    freeHoursPerDay: freeHours,
+            freeHoursPerDay: freeHours,
 
+            difficulty:
+                aiResponse.difficulty
 
-    difficulty:
-        aiResponse.difficulty
+        });
 
-});
+        console.log("STEP 3 : Risk Done");
 
-    //later added 
-    const scheduleAnalysis = generateSchedule({
+        const scheduleAnalysis = generateSchedule({
 
-        subtasks: aiResponse.subtasks,
+            subtasks: aiResponse.subtasks,
 
-        deadline,
+            deadline,
 
-        freeHoursPerDay: freeHours
+            freeHoursPerDay: freeHours
 
-    });
-    //
+        });
 
+        console.log("STEP 4 : Schedule Done");
 
-    // added/////////////////
-    const savedTask = await saveTask({
+        const savedTask = await saveTask({
 
-    task,
+            task,
 
-    deadline,
+            deadline,
 
-    free_hours_per_day: freeHours,
+            free_hours_per_day: freeHours,
 
-    total_estimated_hours: aiResponse.total_estimated_hours,
+            total_estimated_hours:
+                aiResponse.total_estimated_hours,
 
-    difficulty: aiResponse.difficulty,
+            difficulty:
+                aiResponse.difficulty,
 
-    pri_score: riskAnalysis.pri,
+            pri_score:
+                riskAnalysis.pri,
 
-    risk_level: riskAnalysis.level,
+            risk_level:
+                riskAnalysis.level,
 
-    recommendation: riskAnalysis.recommendation,
+            recommendation:
+                riskAnalysis.recommendation,
 
-    ai_response: aiResponse,
+            ai_response:
+                aiResponse,
 
-    // later add
-    schedule: scheduleAnalysis
+            schedule:
+                scheduleAnalysis
 
-});
-    ///////////////////
+        });
 
+        console.log("STEP 5 : Saved to Supabase");
 
+        console.log("STEP 6 : Preparing response");
 
-//         res.json({
-//     success:true,
-//     taskAnalysis: aiResponse,
-//     riskAnalysis
-// });
+        const responseData = {
 
-    res.json({
-    success: true,
+            success: true,
 
-    data: {
-        savedTask,
-        taskAnalysis: aiResponse,
-        riskAnalysis,
-        scheduleAnalysis
+            data: {
+
+                savedTask,
+
+                taskAnalysis: aiResponse,
+
+                riskAnalysis,
+
+                scheduleAnalysis
+
+            }
+
+        };
+
+        console.log("STEP 7 : Sending response");
+
+        return res.status(200).json(responseData);
+
+    } catch (error) {
+
+        console.error("CONTROLLER ERROR:", error);
+
+        if (!res.headersSent) {
+
+            return res.status(500).json({
+
+                success: false,
+
+                message: error.message
+
+            });
+
+        }
+
     }
 
-});
-
-    } catch(error){
-
-    console.error(error);
-
-    res.status(500).json({
-
-        success:false,
-
-        message:error.message
-
-    });
-
-}
 }
 
-
-/// added 
 async function getAllTasksController(req, res) {
 
     try {
 
         const tasks = await getAllTasks();
 
-        res.json({
+        return res.status(200).json({
 
             success: true,
 
@@ -203,13 +422,11 @@ async function getAllTasksController(req, res) {
 
         });
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
 
@@ -220,7 +437,6 @@ async function getAllTasksController(req, res) {
     }
 
 }
-//
 
 module.exports = {
     breakdownTaskController,
