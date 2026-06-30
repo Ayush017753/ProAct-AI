@@ -1,4 +1,9 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { AlertTriangle, CalendarDays, Clock3, Brain } from "lucide-react";
+import RiskChart from "./RiskChart";
 
 export default function RiskCard({ risk }) {
 
@@ -6,25 +11,45 @@ export default function RiskCard({ risk }) {
 
         return (
 
-            <Card>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+            >
 
-                <CardHeader>
+                <Card className="rounded-3xl shadow-2xl border-0">
 
-                    <CardTitle>
-                        Risk Analysis
-                    </CardTitle>
+                    <CardHeader>
 
-                </CardHeader>
+                        <CardTitle className="flex items-center gap-2">
 
-                <CardContent>
+                            <AlertTriangle className="text-orange-500" />
 
-                    <p className="text-gray-500">
-                        Generate a task to see risk analysis.
-                    </p>
+                            AI Risk Analysis
 
-                </CardContent>
+                        </CardTitle>
 
-            </Card>
+                    </CardHeader>
+
+                    <CardContent className="space-y-5">
+
+                        <RiskChart risk={risk} />
+
+                        <div className="bg-slate-100 rounded-2xl p-4">
+
+                            <p className="text-gray-500 text-center">
+
+                                Generate an AI Plan to view risk prediction.
+
+                            </p>
+
+                        </div>
+
+                    </CardContent>
+
+                </Card>
+
+            </motion.div>
 
         );
 
@@ -39,91 +64,161 @@ export default function RiskCard({ risk }) {
 
     return (
 
-        <Card>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+        >
 
-            <CardHeader>
+            <Card className="rounded-3xl shadow-2xl border-0">
 
-                <CardTitle>
+                <CardHeader>
 
-                    Risk Analysis
+                    <CardTitle className="flex items-center gap-2">
 
-                </CardTitle>
+                        <AlertTriangle className="text-red-500" />
 
-            </CardHeader>
+                        AI Risk Analysis
 
-            <CardContent className="space-y-4">
+                    </CardTitle>
 
-                <div>
+                </CardHeader>
 
-                    <p className="text-sm text-gray-500">
-                        Priority Risk Index
-                    </p>
+                <CardContent className="space-y-6">
 
-                    <h2 className="text-4xl font-bold">
+                    <RiskChart risk={risk} />
 
-                        {risk.pri}
+                    <div className="text-center">
 
-                    </h2>
+                        <h1 className="text-5xl font-black text-indigo-700">
 
-                </div>
+                            {risk.pri}
 
-                <div>
+                        </h1>
 
-                    <span
-                        className={`px-3 py-1 rounded-full text-white ${badgeColor}`}
-                    >
-                        {risk.level}
-                    </span>
+                        <p className="text-gray-500">
 
-                </div>
+                            Priority Risk Index
 
-                <div>
+                        </p>
 
-                    <p className="font-semibold">
+                    </div>
 
-                        Recommendation
+                    <div className="flex justify-center">
 
-                    </p>
+                        <span
+                            className={`px-5 py-2 rounded-full text-white font-bold shadow-lg ${badgeColor}`}
+                        >
 
-                    <p className="text-gray-700">
+                            {
+                                risk.level === "High"
+                                    ? "🔥 HIGH RISK"
+                                    : risk.level === "Medium"
+                                    ? "🟡 MEDIUM RISK"
+                                    : "🟢 LOW RISK"
+                            }
 
-                        {risk.recommendation}
+                        </span>
 
-                    </p>
+                    </div>
 
-                </div>
+                    <div className="rounded-2xl bg-gradient-to-r from-indigo-50 to-blue-50 p-5">
 
-                <div className="border-t pt-4 space-y-1">
+                        <h3 className="font-bold text-lg mb-2">
 
-                    <p>
+                            🤖 AI Recommendation
 
-                        <strong>Days Remaining:</strong> {risk.daysRemaining}
+                        </h3>
 
-                    </p>
+                        <p className="text-gray-700 leading-7">
 
-                    <p>
+                            {risk.recommendation}
 
-                        <strong>Available Hours:</strong> {risk.availableHours}
+                        </p>
 
-                    </p>
+                    </div>
 
-                    <p>
+                    <div className="grid grid-cols-2 gap-4">
 
-                        <strong>Required Hours:</strong> {risk.requiredHours}
+                        <div className="rounded-xl bg-slate-100 p-4">
 
-                    </p>
+                            <CalendarDays className="mb-2 text-blue-600" />
 
-                    <p>
+                            <p className="text-sm text-gray-500">
 
-                        <strong>Difficulty:</strong> {risk.difficulty}
+                                Days Remaining
 
-                    </p>
+                            </p>
 
-                </div>
+                            <h2 className="text-2xl font-bold">
 
-            </CardContent>
+                                {risk.daysRemaining}
 
-        </Card>
+                            </h2>
+
+                        </div>
+
+                        <div className="rounded-xl bg-slate-100 p-4">
+
+                            <Clock3 className="mb-2 text-green-600" />
+
+                            <p className="text-sm text-gray-500">
+
+                                Available Hours
+
+                            </p>
+
+                            <h2 className="text-2xl font-bold">
+
+                                {risk.availableHours}
+
+                            </h2>
+
+                        </div>
+
+                        <div className="rounded-xl bg-slate-100 p-4">
+
+                            <Clock3 className="mb-2 text-orange-600" />
+
+                            <p className="text-sm text-gray-500">
+
+                                Required Hours
+
+                            </p>
+
+                            <h2 className="text-2xl font-bold">
+
+                                {risk.requiredHours}
+
+                            </h2>
+
+                        </div>
+
+                        <div className="rounded-xl bg-slate-100 p-4">
+
+                            <Brain className="mb-2 text-purple-600" />
+
+                            <p className="text-sm text-gray-500">
+
+                                Difficulty
+
+                            </p>
+
+                            <h2 className="text-2xl font-bold capitalize">
+
+                                {risk.difficulty}
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </CardContent>
+
+            </Card>
+
+        </motion.div>
 
     );
 

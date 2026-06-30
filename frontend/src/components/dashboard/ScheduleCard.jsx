@@ -1,4 +1,9 @@
+
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { CalendarDays, Clock3, CheckCircle2 } from "lucide-react";
 
 export default function ScheduleCard({ schedule }) {
 
@@ -6,134 +11,201 @@ export default function ScheduleCard({ schedule }) {
 
         return (
 
-            <Card>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+            >
 
-                <CardHeader>
+                <Card className="rounded-3xl shadow-2xl border-0">
 
-                    <CardTitle>
-                        📅 AI Generated Schedule
-                    </CardTitle>
+                    <CardHeader>
 
-                </CardHeader>
+                        <CardTitle className="flex items-center gap-2">
 
-                <CardContent>
+                            <CalendarDays className="text-blue-600" />
 
-                    <p className="text-gray-500">
-                        Generate a task to see your schedule.
-                    </p>
+                            📅 AI Schedule
 
-                </CardContent>
+                        </CardTitle>
 
-            </Card>
+                    </CardHeader>
+
+                    <CardContent>
+
+                        <p className="text-gray-500">
+
+                            Generate an AI plan to view your smart schedule.
+
+                        </p>
+
+                    </CardContent>
+
+                </Card>
+
+            </motion.div>
 
         );
 
     }
 
-    const scheduleData = schedule.schedule;
-
-    const unscheduledTasks = schedule.unscheduledTasks;
+    const scheduleData = schedule.schedule || [];
 
     return (
 
-        <Card>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+        >
 
-            <CardHeader>
+            <Card className="rounded-3xl shadow-2xl border-0">
 
-                <CardTitle>
+                <CardHeader>
 
-                    📅 AI Generated Schedule
+                    <CardTitle className="flex items-center gap-2">
 
-                </CardTitle>
+                        <CalendarDays className="text-blue-600" />
 
-            </CardHeader>
+                        📅 AI Generated Schedule
 
-            <CardContent className="space-y-6">
+                    </CardTitle>
 
-                {scheduleData.map((day, index) => (
+                </CardHeader>
 
-                    <div
-                        key={index}
-                        className="border rounded-lg p-4"
-                    >
+                <CardContent className="space-y-6">
 
-                        <h3 className="font-bold text-lg mb-3">
+                    {scheduleData.map((day, index) => (
 
-                            {day.date}
+                        <motion.div
 
-                        </h3>
+                            key={index}
 
-                        <div className="space-y-2">
+                            initial={{ opacity: 0, x: -20 }}
 
-                            {day.tasks.map((task, taskIndex) => (
+                            animate={{ opacity: 1, x: 0 }}
 
-                                <div
-                                    key={taskIndex}
-                                    className="flex justify-between items-center bg-slate-100 rounded-md p-3"
-                                >
+                            transition={{
+                                delay: index * 0.1
+                            }}
 
-                                    <div>
+                            className="relative border-l-4 border-blue-600 pl-6"
 
-                                        <p className="font-medium">
+                        >
 
-                                            {task.title}
+                            <div className="absolute -left-3 top-1 w-5 h-5 rounded-full bg-blue-600"></div>
 
-                                        </p>
+                            <h3 className="text-xl font-bold text-blue-700 mb-4">
 
-                                        <p className="text-sm text-gray-500">
+                                📅 {day.date}
 
-                                            {task.priority}
+                            </h3>
 
-                                        </p>
+                            <div className="space-y-3">
+
+                                {day.tasks.map((task, taskIndex) => (
+
+                                    <div
+
+                                        key={taskIndex}
+
+                                        className="rounded-2xl bg-gradient-to-r from-slate-50 to-blue-50 shadow-md hover:shadow-xl transition-all p-5"
+
+                                    >
+
+                                        <div className="flex justify-between items-start">
+
+                                            <div>
+
+                                                <h4 className="font-bold text-lg">
+
+                                                    {task.title}
+
+                                                </h4>
+
+                                                <p className="text-gray-600 mt-2">
+
+                                                    {task.description}
+
+                                                </p>
+
+                                            </div>
+
+                                            <CheckCircle2 className="text-green-500" />
+
+                                        </div>
+
+                                        <div className="flex gap-5 mt-4 flex-wrap">
+
+                                            <div className="flex items-center gap-2">
+
+                                                <Clock3
+                                                    size={18}
+                                                    className="text-blue-600"
+                                                />
+
+                                                <span>
+
+                                                    {task.hours} hrs
+
+                                                </span>
+
+                                            </div>
+
+                                            <span className="px-3 py-1 rounded-full bg-indigo-600 text-white text-sm font-semibold">
+
+                                                {task.priority}
+
+                                            </span>
+
+                                        </div>
 
                                     </div>
 
-                                    <span className="font-bold text-blue-600">
-
-                                        {task.hours} hrs
-
-                                    </span>
-
-                                </div>
-
-                            ))}
-
-                        </div>
-
-                    </div>
-
-                ))}
-
-                {unscheduledTasks.length > 0 && (
-
-                    <div className="border-2 border-red-500 rounded-lg p-4">
-
-                        <h3 className="text-red-600 font-bold mb-3">
-
-                            ⚠ Couldn't Fit Before Deadline
-
-                        </h3>
-
-                        {unscheduledTasks.map((task, index) => (
-
-                            <div
-                                key={index}
-                                className="mb-2"
-                            >
-
-                                {task.title} ({task.remainingHours} hrs)
+                                ))}
 
                             </div>
 
-                        ))}
+                        </motion.div>
 
-                    </div>
+                    ))}
 
-                )}
+                    {schedule.unscheduledTasks?.length > 0 && (
 
-            </CardContent>
+                        <div className="rounded-2xl bg-red-50 border border-red-300 p-5">
 
-        </Card>
+                            <h3 className="text-red-700 font-bold text-lg mb-3">
+
+                                ⚠️ Unscheduled Tasks
+
+                            </h3>
+
+                            <ul className="space-y-2">
+
+                                {schedule.unscheduledTasks.map((task, index) => (
+
+                                    <li
+                                        key={index}
+                                        className="text-red-700"
+                                    >
+
+                                        • {task.title} ({task.remainingHours} hrs)
+
+                                    </li>
+
+                                ))}
+
+                            </ul>
+
+                        </div>
+
+                    )}
+
+                </CardContent>
+
+            </Card>
+
+        </motion.div>
 
     );
 

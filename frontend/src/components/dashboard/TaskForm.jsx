@@ -5,10 +5,13 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import api from "../../services/api";
 
-export default function TaskForm({ setResult }) {
+export default function TaskForm({ setResult , refreshTasks }) {
 
     const [task, setTask] = useState("");
     const [deadline, setDeadline] = useState("");
@@ -40,7 +43,9 @@ export default function TaskForm({ setResult }) {
 
             console.log(response.data);
 
-             setResult(response.data.data);
+            setResult(response.data.data);
+            refreshTasks();
+            toast.success("🎉 AI Plan Generated Successfully!");
 
             console.log("FULL RESULT");
             console.log(response.data.data);
@@ -59,11 +64,11 @@ export default function TaskForm({ setResult }) {
 
             if (error.response) {
 
-                alert(error.response.data.message);
+                toast.error(error.response?.data?.message || "Something went wrong." );
 
             } else {
 
-                alert("Something went wrong.");
+               toast.error("Gemini AI is currently experiencing high demand. Please try again in a minute.");
 
             }
 
@@ -77,64 +82,68 @@ export default function TaskForm({ setResult }) {
 
     return (
 
-        <Card>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+        >
+            <Card>
 
-            <CardHeader>
+                <CardHeader>
 
-                <CardTitle>
+                    <CardTitle>
 
-                    Create New Task
+                        Create New Task
 
-                </CardTitle>
+                    </CardTitle>
 
-            </CardHeader>
+                </CardHeader>
 
-            <CardContent>
+                <CardContent>
 
-                <div className="space-y-4">
+                    <div className="space-y-4">
 
-                    <Input
-                        placeholder="Enter Your Task"
-                        value={task}
-                        onChange={(e) => setTask(e.target.value)}
-                    />
+                        <Input
+                            placeholder="Enter Your Task"
+                            value={task}
+                            onChange={(e) => setTask(e.target.value)}
+                        />
 
-                    <Input
-                        type="date"
-                        value={deadline}
-                        onChange={(e) => setDeadline(e.target.value)}
-                    />
+                        <Input
+                            type="date"
+                            value={deadline}
+                            onChange={(e) => setDeadline(e.target.value)}
+                        />
 
-                    <Input
-                        type="number"
-                        placeholder="Free hours per day"
-                        value={freeHoursPerDay}
-                        onChange={(e) => setFreeHoursPerDay(e.target.value)}
-                    />
+                        <Input
+                            type="number"
+                            placeholder="Free hours per day"
+                            value={freeHoursPerDay}
+                            onChange={(e) => setFreeHoursPerDay(e.target.value)}
+                        />
 
-                    <Button 
-                        className="w-full"
-                        onClick={handleSubmit}
-                        disabled={loading}
-                    >
-
-                        {
-
-                            loading
-                                ?
-                                "🤖 Generating AI Plan..."
-                                :
+                        <Button
+                            className="w-full h-12 text-lg"
+                            onClick={handleSubmit}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    AI is Planning...
+                                </>
+                            ) : (
                                 "🚀 Generate AI Plan"
+                            )}
+                        </Button>
 
-                        }
+                    </div>
 
-                    </Button>
+                </CardContent>
 
-                </div>
+            </Card>
+        </motion.div>
 
-            </CardContent>
-
-        </Card>
 
     );
 
