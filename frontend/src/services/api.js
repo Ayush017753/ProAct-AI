@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://proact-ai-backend-u03n.onrender.com/api",
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
     timeout: 30000,
 });
 
